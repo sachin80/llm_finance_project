@@ -1,0 +1,25 @@
+name: llm-finace
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - numpy
+  - pandas
+  - scipy
+  - scikit-learn
+  - matplotlib
+  - openpyxl
+  - cvxpy
+  - clarabel
+  - osqp
+  - pyarrow
+  - python-dotenv
+  - tenacity
+  - tqdm
+  - pip
+  - pip:
+      - openai
+      - yfinance
+      - backtrader
+      - jupyter
+      - ipykernel

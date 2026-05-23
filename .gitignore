@@ -18,4 +18,7 @@ venv/
 # Project outputs
 outputs/
 outputs_signal_compare/
-*.pkl
+*.pkl__pycache__/
+*.pyc
+.DS_Store
+outputs/

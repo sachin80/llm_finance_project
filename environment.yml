@@ -16,6 +16,8 @@ dependencies:
   - python-dotenv
   - tenacity
   - tqdm
+  - pytest
+  - pydantic
   - pip
   - pip:
       - openai
@@ -23,3 +25,4 @@ dependencies:
       - backtrader
       - jupyter
       - ipykernel
+      - edgartools

@@ -1,0 +1,4 @@
+label,signal_name,mean_ic_original,mean_ic_sector_neutral
+Static TF-IDF,static_tfidf,0.06266212647647429,0.025174128136700464
+Static embedding,static_embedding,0.05356228546827506,0.026063122386585022
+SEC similarity × exposure,sec_similarity_x_exposure,0.07025167696232201,0.04116218211605793

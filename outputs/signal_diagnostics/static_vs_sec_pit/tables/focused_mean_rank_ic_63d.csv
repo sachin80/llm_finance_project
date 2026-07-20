@@ -1,0 +1,5 @@
+signal_name,label,horizon,mean_ic,p_value,positive_ic_rate
+sec_similarity_x_exposure,SEC similarity × exposure,63D,0.07025167696232201,0.0032216738531314778,0.78125
+static_tfidf,Static TF-IDF,63D,0.06266212647647429,0.016964994971500603,0.71875
+sec_summary_similarity,SEC summary similarity,63D,0.05690767025350659,0.06154831327897092,0.71875
+static_embedding,Static embedding,63D,0.05356228546827506,0.052005885037801895,0.6875

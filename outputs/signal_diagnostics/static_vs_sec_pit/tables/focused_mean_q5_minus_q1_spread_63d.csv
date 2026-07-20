@@ -1,0 +1,5 @@
+signal_name,label,horizon,mean_spread,p_value,positive_spread_rate
+sec_similarity_x_exposure,SEC similarity × exposure,63D,0.06492254060960367,0.00043355278211652305,0.84375
+static_tfidf,Static TF-IDF,63D,0.05164060497714217,0.00488220419726264,0.75
+sec_summary_similarity,SEC summary similarity,63D,0.04867331915946542,0.008793533015619488,0.75
+static_embedding,Static embedding,63D,0.0417831982519153,0.00983596748527664,0.75

@@ -1,24 +1,52 @@
 # Python
 __pycache__/
-*.pyc
+*.py[cod]
 .ipynb_checkpoints/
 
-# Environments
+# Environments / secrets
 .env
+*.env
 .venv/
 venv/
-
-# Jupyter
-.ipynb_checkpoints/
 
 # OS / editor
 .DS_Store
 .vscode/
 
-# Project outputs
-outputs/
+# Large/generated data artifacts
+*.pkl
+*.pickle
+
+# Ignore most generated outputs by default
+outputs/*
 outputs_signal_compare/
-*.pkl__pycache__/
-*.pyc
-.DS_Store
-outputs/
+
+# But keep curated diagnostics for the paper/deck
+!outputs/signal_diagnostics/
+outputs/signal_diagnostics/*
+
+!outputs/signal_diagnostics/static_vs_sec_pit/
+outputs/signal_diagnostics/static_vs_sec_pit/*
+
+!outputs/signal_diagnostics/static_vs_sec_pit/paired_delta_tests.csv
+
+!outputs/signal_diagnostics/static_vs_sec_pit/tables/
+!outputs/signal_diagnostics/static_vs_sec_pit/tables/*.csv
+
+!outputs/signal_diagnostics/static_vs_sec_pit/plots_focused/
+!outputs/signal_diagnostics/static_vs_sec_pit/plots_focused/*.png
+
+# Explicitly ignore bulky SEC/OpenAI generated state
+outputs/sec/
+outputs/sec_openai_walkthrough/
+outputs/sec_pit_openai/manifests/
+outputs/sec_pit_openai/raw_text/
+outputs/sec_pit_openai/selected_text/
+outputs/sec_pit_openai/logs/
+outputs/sec_pit_openai/panels/
+outputs/sec_pit_openai/diagnostics/*.pkl
+
+# Optional strategy outputs; generated, not source
+outputs/portfolio_values_all_strategies.csv
+outputs/returns_all_strategies.csv
+outputs/weights_*.csv

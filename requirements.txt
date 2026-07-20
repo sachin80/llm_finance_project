@@ -16,3 +16,6 @@ yfinance
 backtrader
 jupyter
 ipykernel
+pytest
+pydantic
+edgartools

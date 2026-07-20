@@ -1,0 +1,3 @@
+candidate_signal,baseline_signal,horizon,kind,n_months,mean_delta,std_delta,t_stat,p_value,candidate_win_rate,baseline_label,comparison
+sec_similarity_x_exposure,static_embedding,63D,spread,32,0.02313934235768838,0.025384464216831916,3.5512264223729724,0.00038344039351600047,0.84375,Static embedding,vs Static embedding
+sec_similarity_x_exposure,static_tfidf,63D,spread,32,0.013281935632461505,0.021740354183307095,2.9316984188716293,0.003371139392280837,0.6875,Static TF-IDF,vs Static TF-IDF

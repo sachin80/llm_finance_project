@@ -1,0 +1,69 @@
+{
+  "composite_score": null,
+  "factor_names_from_files": {
+    "all_factors": [
+      "sec_direct_or_indirect",
+      "sec_direct_or_indirect_sector_neutral",
+      "sec_evidence_strength",
+      "sec_exposure_score",
+      "sec_exposure_score_sector_neutral",
+      "sec_similarity_x_direction",
+      "sec_similarity_x_evidence",
+      "sec_similarity_x_exposure",
+      "sec_similarity_x_exposure_sector_neutral",
+      "sec_summary_similarity",
+      "sec_summary_similarity_sector_neutral",
+      "static_embedding",
+      "static_embedding_sector_neutral",
+      "static_tfidf",
+      "static_tfidf_sector_neutral"
+    ],
+    "full_summary": [
+      "sec_direct_or_indirect",
+      "sec_evidence_strength",
+      "sec_exposure_score",
+      "sec_similarity_x_direction",
+      "sec_similarity_x_evidence",
+      "sec_similarity_x_exposure",
+      "sec_summary_similarity",
+      "static_embedding",
+      "static_tfidf"
+    ],
+    "sector_neutral_summary": [
+      "sec_direct_or_indirect_sector_neutral",
+      "sec_exposure_score_sector_neutral",
+      "sec_similarity_x_exposure_sector_neutral",
+      "sec_summary_similarity_sector_neutral",
+      "static_embedding_sector_neutral",
+      "static_tfidf_sector_neutral"
+    ]
+  },
+  "generated_at_utc": "2026-07-20T21:54:40.208222+00:00",
+  "horizons": [
+    "21D",
+    "63D"
+  ],
+  "ic_method": "Spearman rank correlation; mean monthly rank IC",
+  "input_files": {
+    "full_summary": "outputs/sec_pit_openai/diagnostics/full_static_vs_sec_summary.csv",
+    "mean_quantile_returns": "outputs/signal_diagnostics/static_vs_sec_pit/tables/mean_quantile_returns.csv",
+    "paired_delta_tests": "outputs/signal_diagnostics/static_vs_sec_pit/tables/paired_delta_tests.csv",
+    "sector_abs_alpha_share": "outputs/signal_diagnostics/static_vs_sec_pit/tables/sec_sector_abs_alpha_share.csv",
+    "sector_neutral_summary": "outputs/signal_diagnostics/static_vs_sec_pit/tables/sector_neutral_summary.csv"
+  },
+  "missing_value_policy": "Unavailable diagnostics remain null/NaN; no metric is imputed or invented.",
+  "output_csv": "outputs/signal_diagnostics/static_vs_sec_pit/tables/factor_selection_audit.csv",
+  "ranking_rule": null,
+  "sector_concentration_method": "Latest-date share of total absolute alpha by sector; the audit records the largest sector and its share when available.",
+  "sector_neutralization_method": "Within each rebalance date and sector, subtract the sector mean and divide by the sector sample standard deviation; sectors require at least three available stocks.",
+  "selection_protocol": [
+    "Prefer point-in-time SEC signals over static baselines.",
+    "Emphasize 63D performance only when consistent across rank IC, Q5-Q1 spread, positive-spread rate, and robustness checks.",
+    "Prefer factors with strong Q5-Q1 spread and positive spread rate.",
+    "Prefer factors that remain positive after sector neutralization.",
+    "Prefer economically interpretable engineered factors.",
+    "Do not select a factor from a single p-value.",
+    "Do not add an opaque composite score or expand the factor search."
+  ],
+  "spread_definition": "Mean monthly Q5 minus Q1 forward return"
+}

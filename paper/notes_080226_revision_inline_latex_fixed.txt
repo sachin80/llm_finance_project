@@ -1,0 +1,1033 @@
+I reviewed the attached 23-page version. The core structure is strong: point-in-time filing measurement, frozen factor selection, expected-return calibration, and optimizer demonstration should remain. 
+
+The biggest changes are targeted:
+
+* Pages 8–10 repeat the population mean, current forecast, historical shrinkage, and stock-level forecast several times. Those should become one unified section. 
+* The overlap discussion appears once as estimator robustness and again later as a bias/dependence addendum. Those should be consolidated and expanded with López de Prado’$$s$$ concurrency and uniqueness framework.  
+* The current nine-item signal-inference list and ten-item calibration list are broader than the main paper needs. 
+* The interaction, filing-form, and filing-age audits should remain because overlap corrections do not test whether the signal itself is well constructed. They can, however, be reported more efficiently. 
+
+The new overlap material follows López de Prado’$$s$$ treatment of concurrency and average uniqueness, while the inference design uses Jansen’$$s$$ overlap-aware evaluation and block-bootstrap recommendations.   Efron and Hastie provide the direct moving-block-bootstrap foundation. 
+
+```text
+REVISION PACKAGE FOR NOTES_080226
+
+GENERAL CHANGE MAP
+
+KEEP WITHOUT MAJOR REWRITING
+
+1. INTRO.
+2. The basic point-in-time SEC filing signal.
+3. Cross-sectional signal standardization.
+4. Forward active-return construction.
+5. The completed-outcome rule.
+6. The historical cross-sectional regression.
+7. The normal-normal empirical-Bayes model.
+8. Q5-premium empirical Bayes as a distinct nonlinear estimator.
+9. The constrained optimizer.
+10. The methodology-and-measurement framing and limitations.
+
+REPLACE OR CONSOLIDATE
+
+1. Replace the current NOTATION block.
+2. Replace Filing availability through Raw interaction signal.
+3. Insert a Signal provenance and reproducibility contract.
+4. Replace the current Signal audits subsections with a more focused version.
+5. Replace Robust historical slope estimates.
+6. Replace the explanation of between-date variance.
+7. Replace Shrunk historical slopes through STOCK LEVEL EXPECTED ACTIVE RETURNS with one unified section.
+8. Replace OVERLAPPING RETURN ROBUSTNESS and the later Overlapping-return dependence discussion with one section.
+9. Replace DEPENDENCE AWARE SIGNAL INFERENCE.
+10. Replace most of CALIBRATION VALIDATION.
+11. Replace Current Q5 forecast notation.
+12. Replace the current figure-and-diagnostic wish list with the focused paper exhibit plan below.
+13. Update the implementation order.
+
+============================================================
+REPLACE: NOTATION
+============================================================
+
+NOTATION
+
+The 21-day and 63-day models are estimated separately. Throughout any individual derivation, the horizon $$h$$ is treated as fixed, so the horizon superscript may be suppressed when it is unambiguous.
+
+$$i$$ = stock index.
+
+$$k$$ = filing index for stock $$i$$.
+
+$$s$$ = completed historical rebalance date.
+
+$$t$$ = current forecast date.
+
+$$h$$ = fixed forward-return horizon, where $$h$$ is either 21 or 63 trading days.
+
+$$U_t$$ = set of stocks eligible to receive a signal at date $$t$$.
+
+$$V_t^{(h)}$$ = exact set of stocks with both a valid signal and a valid $$h$$-day forward-return outcome at date $$t$$.
+
+$$V_t^{(h)}=\left\{i\in U_t:z_{i,t}\text{ and }R_{i,t}^{(h)}\text{ are observed}\right\}.$$
+
+$$N_t^{(h)}=\left|V_t^{(h)}\right|.$$
+
+Therefore, $$N_t^{(h)}$$ is the number of stocks in the exact cross-sectional sample used for horizon $$h$$ at date $$t$$. It is not necessarily the total number of securities in the nominal universe.
+
+$$e_h(s)$$ = trading date on which the $$h$$-day forward return beginning at historical date $$s$$ is complete.
+
+$$W_h(t)=\left\{s:e_h(s)<t\right\}.$$
+
+$$W_h(t)$$ is the set of completed historical rebalance dates available for estimation at forecast date $$t$$.
+
+$$z_{i,t}$$ = standardized SEC signal for stock $$i$$ at date $$t$$.
+
+$$y_{i,s}^{(h)}$$ = realized $$h$$-day forward active return for stock $$i$$ beginning at historical date $$s$$.
+
+$$\widehat{\beta}_s$$ = direct cross-sectional slope estimated for completed historical date $$s$$.
+
+$$\beta_s$$ = true but unobserved cross-sectional slope for historical date $$s$$.
+
+$$v_s$$ = estimated sampling variance of $$\widehat{\beta}_s$$.
+
+$$\widehat{\tau}_{\beta,t}^2$$ = estimated genuine between-date variance using information available by date $$t$$.
+
+$$\widehat{\mu}_{\beta,t}$$ = estimated population mean slope using completed information available by date $$t$$.
+
+$$\widehat{\beta}_{s\mid t}^{EB}$$ = empirical-Bayes estimate of the latent historical slope belonging to date $$s$$, using information available through date $$t$$.
+
+$$\widehat{\mu}_{i,t}$$ = estimated forward active return for stock $$i$$ at date $$t$$.
+
+When a historical regression is estimated, the signal and active-return target are recentered within the exact valid sample $$V_s^{(h)}$$ after all missing observations have been removed.
+
+============================================================
+REPLACE: FILING AVAILABILITY THROUGH RAW INTERACTION SIGNAL
+============================================================
+
+FILING AVAILABILITY
+
+For stock $$i$$, let $$k$$ index its historical SEC filings.
+
+Let $$d_{i,k}$$ denote the SEC acceptance date or the conservative publication timestamp used by the project. Let $$\Delta$$ denote the filing-availability lag. The filing becomes strategy-available on:
+
+$$a_{i,k}=d_{i,k}+\Delta.$$
+
+At rebalance date $$t$$, select:
+
+$$k(i,t)=\arg\max_{k:a_{i,k}\leq t}a_{i,k}.$$
+
+This selects the most recently available filing for stock $$i$$. A filing whose availability date occurs after $$t$$ cannot influence the signal at $$t$$.
+
+The selected filing should be identified by accession number rather than only by ticker and filing date.
+
+SEMANTIC SIMILARITY
+
+Let $$S_{i,k}$$ denote the structured summary extracted from filing $$k$$ for stock $$i$$. Let $$T$$ denote the frozen AI-infrastructure theme description. Let $$E(\cdot)$$ denote the embedding function.
+
+The point-in-time filing-to-theme similarity is:
+
+$$q_{i,t}=\frac{E\left(S_{i,k(i,t)}\right)^\top E(T)}{\left\|E\left(S_{i,k(i,t)}\right)\right\|\left\|E(T)\right\|}.$$
+
+EXPOSURE MATERIALITY
+
+Let $$m_{i,k}$$ denote the exposure-materiality score extracted from filing $$k$$ for stock $$i$$.
+
+At date $$t$$, the available exposure score is:
+
+$$m_{i,t}=m_{i,k(i,t)}.$$
+
+The coding is:
+
+3 = direct and economically material exposure.
+
+2 = indirect but meaningful exposure.
+
+1 = minimal exposure.
+
+0 = no supported exposure.
+
+RAW INTERACTION SIGNAL
+
+The raw interaction signal is:
+
+$$x_{i,t}=q_{i,t}m_{i,t}.$$
+
+The interaction has a specific economic interpretation. Semantic similarity measures whether the filing discusses the theme. Materiality measures whether the discussion describes meaningful economic exposure. Multiplication gives limited weight to generic AI-related language unless the filing also supports material economic exposure.
+
+The interaction was constructed before the empirical-Bayes estimator. Its selection from the candidate-factor set must be disclosed separately from its subsequent return calibration.
+
+============================================================
+INSERT AFTER FILING AVAILABILITY:
+SIGNAL PROVENANCE AND REPRODUCIBILITY CONTRACT
+============================================================
+
+SIGNAL PROVENANCE AND REPRODUCIBILITY CONTRACT
+
+Every stock-date signal observation must retain enough metadata to reproduce exactly what information was available and how the feature was generated.
+
+For each selected filing, retain:
+
+1. Stock identifier and CIK.
+2. Rebalance date.
+3. Filing accession number.
+4. Filing form.
+5. Fiscal period end.
+6. SEC acceptance timestamp.
+7. Strategy availability timestamp.
+8. Local ingestion timestamp.
+9. Filing section or sections used.
+10. Filing-summary identifier.
+11. OpenAI model identifier.
+12. API execution date.
+13. Prompt version or prompt hash.
+14. Structured-output schema version or schema hash.
+15. Theme-description version or hash.
+16. Embedding-model identifier.
+17. Saved structured JSON output.
+18. Output or response hash.
+19. Any missingness, retry, or abstention status.
+
+These timestamps represent different concepts:
+
+Fiscal period end describes the economic period covered by the disclosure.
+
+SEC acceptance time describes when the filing became public.
+
+Strategy availability time describes when the research pipeline permits the filing to affect a signal.
+
+Ingestion time describes when the local system actually processed the document.
+
+The paper should not collapse these timestamps into a single generic filing date.
+
+This contract does not prove that the LLM lacked later pretraining knowledge. It does ensure that the document, pipeline configuration, and saved measurement are auditable.
+
+============================================================
+REPLACE: SIGNAL AUDITS
+============================================================
+
+SIGNAL AUDITS
+
+The signal audits test measurement validity. They are not replaced by overlap corrections, empirical Bayes, or block-bootstrap inference.
+
+INTERACTION VERSUS COMPONENTS
+
+The product may be dominated by the discrete exposure-materiality score. The paper must therefore compare:
+
+1. Semantic similarity alone, $$q_{i,t}$$.
+2. Exposure materiality alone, $$m_{i,t}$$.
+3. The interaction, $$x_{i,t}=q_{i,t}m_{i,t}$$.
+
+For each date, calculate Pearson and Spearman correlations between the interaction and each component:
+
+$$\rho_{x,m,t}^{P}=\operatorname{Corr}_{P}(x_{i,t},m_{i,t}),\quad \rho_{x,m,t}^{S}=\operatorname{Corr}_{S}(x_{i,t},m_{i,t}).$$
+
+$$\rho_{x,q,t}^{P}=\operatorname{Corr}_{P}(x_{i,t},q_{i,t}),\quad \rho_{x,q,t}^{S}=\operatorname{Corr}_{S}(x_{i,t},q_{i,t}).$$
+
+Report the median and interquartile range of these date-level correlations rather than producing a separate correlation plot for every date.
+
+The predictive ablation should report the same primary statistics for similarity, materiality, and the interaction:
+
+1. Mean rank IC.
+2. Block-bootstrap confidence interval for mean rank IC.
+3. Q5-minus-Q1 active-return spread.
+4. Sector-neutral Q5-minus-Q1 spread.
+
+Also test whether similarity is more informative when materiality is high. Divide the nonzero-exposure observations into lower- and higher-materiality groups and compare the rank relationship between similarity and subsequent return within the two groups.
+
+If the interaction is almost perfectly correlated with materiality and does not improve predictive evidence, the paper should describe the factor primarily as a materiality score modulated by semantic relevance rather than claiming that both components contribute equally.
+
+10-K VERSUS 10-Q AUDIT
+
+Do not require separate distribution figures for every signal variable.
+
+Create one summary table by filing form containing:
+
+1. Number of observations.
+2. Median and interquartile range of semantic similarity.
+3. Distribution of materiality categories.
+4. Median and interquartile range of the raw interaction.
+5. Median filing age.
+
+Then run one 10-K-only predictive robustness analysis for the selected signal.
+
+The main text should report whether the selected signal’$$s$$ result is directionally similar in the 10-K-only sample. Detailed 10-K and 10-Q distributions can be placed in the appendix.
+
+FILING-AGE AUDIT
+
+Report:
+
+1. Median filing age.
+2. Interquartile range.
+3. 90th percentile.
+4. Percentage older than 180 calendar days.
+
+Run one robustness analysis excluding:
+
+$$A_{i,t}>180\text{ calendar days}.$$
+
+The additional nine-month threshold is not required unless the 180-day analysis reveals a material staleness problem.
+
+============================================================
+REPLACE: ROBUST HISTORICAL SLOPE ESTIMATES
+============================================================
+
+ROBUST HISTORICAL SLOPE ESTIMATES
+
+HC1 changes the estimated sampling variance but does not protect the slope point estimate from extreme individual stock returns.
+
+Use:
+
+1. Baseline cross-sectional OLS.
+2. OLS after winsorizing the active-return target at the 1st and 99th percentiles within each historical cross-section.
+
+Rank IC and Q5-minus-Q1 results already provide order-based diagnostics that are less sensitive to individual return magnitudes. A Huber regression is therefore not required in the primary analysis.
+
+Add Huber regression only as an appendix sensitivity if the baseline and winsorized slopes differ materially. Do not delay the paper solely to implement Huber regression.
+
+============================================================
+REPLACE: POPULATION MODEL INTERPRETATION
+============================================================
+
+POPULATION MODEL
+
+Assume that the true historical slopes come from a common population:
+
+$$\beta_s\sim\mathcal{N}\left(\mu_\beta,\tau_\beta^2\right).$$
+
+The parameter $$\mu_\beta$$ is the average underlying cross-sectional return payoff associated with a one-standard-deviation increase in the SEC signal.
+
+The parameter $$\tau_\beta^2$$ is the variance across dates in the true cross-sectional return payoff of the signal.
+
+A small $$\tau_\beta^2$$ means that the latent slope is reasonably similar across historical rebalance dates.
+
+A large $$\tau_\beta^2$$ means that the latent payoff differs substantially across dates.
+
+This is different from the sampling variance $$v_s$$.
+
+The sampling variance $$v_s$$ measures uncertainty in the direct estimate $$\widehat{\beta}_s$$ for one historical date.
+
+The between-date variance $$\tau_\beta^2$$ measures genuine date-to-date variation in the latent slopes after accounting for estimated slope noise.
+
+The baseline method-of-moments estimate is:
+
+$$\widehat{\tau}_{\beta,t}^2=\max\left\{0,\operatorname{Var}_{s\in W_h(t)}\left(\widehat{\beta}_s\right)-\frac{1}{|W_h(t)|}\sum_{s\in W_h(t)}v_s\right\}.$$
+
+The interpretation is:
+
+Observed dispersion of the direct historical slopes = genuine dispersion of the latent historical slopes + average slope-estimation noise.
+
+The lower bound is imposed because a variance cannot be negative.
+
+With overlapping forward-return windows, adjacent direct slopes may be dependent. The method-of-moments estimate remains the primary transparent estimator, but its uncertainty must be evaluated using dependence-preserving resampling and non-overlapping-date sensitivity analyses.
+
+Do not replace the sample variance in this equation with a Newey-West long-run variance. A Newey-West variance estimates uncertainty in a time-series mean; it is not a direct estimator of latent cross-date heterogeneity.
+
+============================================================
+REPLACE: SHRUNK HISTORICAL SLOPES THROUGH
+STOCK LEVEL EXPECTED ACTIVE RETURNS
+============================================================
+
+HISTORICAL SHRINKAGE AND CURRENT POINT-IN-TIME FORECAST
+
+PRECISION WEIGHTS AND POPULATION MEAN
+
+Define:
+
+$$a_{s,t}=\frac{1}{\widehat{\tau}_{\beta,t}^2+v_s}.$$
+
+A historical slope with a smaller total variance receives greater weight. A noisier historical slope receives less weight.
+
+The empirical-Bayes estimate of the population mean slope is:
+
+$$\widehat{\mu}_{\beta,t}=\frac{\sum_{s\in W_h(t)}a_{s,t}\widehat{\beta}_s}{\sum_{s\in W_h(t)}a_{s,t}}.$$
+
+Only completed historical dates in $$W_h(t)$$ are used.
+
+SHRUNK HISTORICAL SLOPES
+
+For a completed historical date $$s$$, define:
+
+$$B_{s,t}=\frac{\widehat{\tau}_{\beta,t}^2}{\widehat{\tau}_{\beta,t}^2+v_s}.$$
+
+The empirical-Bayes estimate of the latent historical slope is:
+
+$$\widehat{\beta}_{s\mid t}^{EB}=B_{s,t}\widehat{\beta}_s+(1-B_{s,t})\widehat{\mu}_{\beta,t}.$$
+
+The quantity $$\widehat{\beta}_{s\mid t}^{EB}$$ estimates the latent slope belonging to historical date $$s$$ using information available through later date $$t$$.
+
+If $$v_s$$ is large, $$B_{s,t}$$ is small and the noisy direct estimate is pulled strongly toward the population mean.
+
+If $$v_s$$ is small, $$B_{s,t}$$ is larger and the direct estimate receives more weight.
+
+These are substantive empirical-Bayes estimates of completed historical effects. They are retrospective because the direct slope $$\widehat{\beta}_s$$ requires the realized forward return beginning at $$s$$. They were not forecasts available at the beginning of date $$s$$.
+
+CURRENT POINT-IN-TIME FORECAST
+
+At current forecast date $$t$$, the forward return beginning at $$t$$ has not yet been observed. Therefore, the direct current slope $$\widehat{\beta}_t$$ is unavailable.
+
+Under the exchangeable random-effects model, the predicted slope for the new period is the estimated population mean:
+
+$$\widehat{\mu}_{\beta,t}.$$
+
+No additional symbol is required for the current forecast coefficient.
+
+The unrestricted stock-level expected active return is:
+
+$$\widehat{\mu}_{i,t}=\widehat{\mu}_{\beta,t}z_{i,t}.$$
+
+Because $$z_{i,t}$$ is centered within the forecast universe:
+
+$$\sum_{i\in U_t}\widehat{\mu}_{i,t}=0.$$
+
+These are expected active returns relative to the equal-weight research universe. They are not forecasts of total stock returns.
+
+OPTIONAL SIGN-CONSTRAINED FORECAST
+
+Define:
+
+$$\widehat{\mu}_{\beta,t}^{+}=\max\left\{0,\widehat{\mu}_{\beta,t}\right\}.$$
+
+The sign-constrained stock-level forecast is:
+
+$$\widehat{\mu}_{i,t}^{+}=\widehat{\mu}_{\beta,t}^{+}z_{i,t}.$$
+
+The zero floor is not part of empirical Bayes. It is an additional economic portfolio rule.
+
+The unrestricted forecast must remain the primary statistical estimate and must always be stored and reported.
+
+The sign-constrained version is a prespecified portfolio sensitivity that turns the factor off when the estimated average payoff is nonpositive. It does not reverse the factor.
+
+The distinction is:
+
+$$\widehat{\beta}_{s\mid t}^{EB}=\text{retrospective shrunk estimate of the latent slope for completed historical date }s.$$
+
+$$\widehat{\mu}_{\beta,t}=\text{point-in-time predicted slope for the new period beginning at date }t.$$
+
+$$\widehat{\mu}_{i,t}=\text{stock-level expected active return at date }t.$$
+
+Delete the separate Relationship to shrunk historical slopes and STOCK LEVEL EXPECTED ACTIVE RETURNS sections because the relevant material is contained here without introducing additional aliases.
+
+============================================================
+REPLACE BOTH OVERLAP SECTIONS WITH:
+OVERLAPPING LABELS, UNIQUENESS, AND DEPENDENCE
+============================================================
+
+OVERLAPPING LABELS, UNIQUENESS, AND DEPENDENCE-AWARE ROBUSTNESS
+
+RETURN-LABEL LEAKAGE
+
+At forecast date $$t$$, only completed historical outcomes may be used:
+
+$$W_h(t)=\left\{s:e_h(s)<t\right\}.$$
+
+This rule prevents return-label leakage. It is the expanding-window analogue of purging because historical observations with unresolved labels are excluded.
+
+An additional embargo is not required for the baseline strictly past-to-future expanding window because the estimator never trains on observations occurring after the forecast date. Embargo becomes relevant if the project later uses K-fold or combinatorial cross-validation containing training observations on both sides of a test period.
+
+OVERLAPPING-RETURN DEPENDENCE
+
+Purging unresolved outcomes does not make the completed historical labels independent.
+
+For each historical date $$s$$, define its forward-return label interval:
+
+$$\mathcal{I}_s^{(h)}=\left\{u:s<u\leq e_h(s)\right\}.$$
+
+Let:
+
+$$L_s^{(h)}=\left|\mathcal{I}_s^{(h)}\right|.$$
+
+For each trading date $$u$$, define the number of completed historical labels that include $$u$$:
+
+$$c_u^{(h)}(t)=\sum_{r\in W_h(t)}\mathbf{1}\left\{u\in\mathcal{I}_r^{(h)}\right\}.$$
+
+The average uniqueness of historical date $$s$$ is:
+
+$$\overline{u}_{s,t}^{(h)}=\frac{1}{L_s^{(h)}}\sum_{u\in\mathcal{I}_s^{(h)}}\frac{1}{c_u^{(h)}(t)}.$$
+
+If a return window shares most of its trading days with several other labels, its average uniqueness is low.
+
+If a return window shares few trading days with other labels, its average uniqueness is high.
+
+Define the uniqueness-equivalent count:
+
+$$N_{\mathrm{unique},t}^{(h)}=\sum_{s\in W_h(t)}\overline{u}_{s,t}^{(h)}.$$
+
+This is a diagnostic measure of nonredundant historical information. It should not be described as an exact number of statistically independent observations.
+
+Report through time:
+
+1. The raw number of completed dates, $$|W_h(t)|$$.
+2. The uniqueness-equivalent count, $$N_{\mathrm{unique},t}^{(h)}$$.
+3. Median average uniqueness.
+4. Minimum average uniqueness.
+5. The ratio $$N_{\mathrm{unique},t}^{(h)}/|W_h(t)|$$.
+
+PRIMARY ESTIMATOR
+
+The primary empirical-Bayes estimator continues to use every completed historical date with ordinary random-effects precision weights:
+
+$$a_{s,t}=\frac{1}{\widehat{\tau}_{\beta,t}^2+v_s}.$$
+
+This is the main estimator because it is transparent and uses all completed information.
+
+UNIQUENESS-WEIGHTED SENSITIVITY
+
+As an overlap sensitivity, define:
+
+$$a_{s,t}^{\mathrm{uniq}}=\frac{\overline{u}_{s,t}^{(h)}}{\widehat{\tau}_{\beta,t}^2+v_s}.$$
+
+Then:
+
+$$\widehat{\mu}_{\beta,t}^{\mathrm{uniq}}=\frac{\sum_{s\in W_h(t)}a_{s,t}^{\mathrm{uniq}}\widehat{\beta}_s}{\sum_{s\in W_h(t)}a_{s,t}^{\mathrm{uniq}}}.$$
+
+This downweights historical dates whose return windows are highly redundant with neighboring dates.
+
+The uniqueness-weighted estimator is a project sensitivity analysis inspired by López de Prado’$$s$$ sample-uniqueness framework. It is not presented as a standard closed-form empirical-Bayes result.
+
+Use the same baseline estimate $$\widehat{\tau}_{\beta,t}^2$$ in the ordinary and uniqueness-weighted means. Do not introduce a separate uniqueness-weighted between-date variance unless the primary results are highly sensitive.
+
+DEPENDENCE-PRESERVING BOOTSTRAP
+
+For date-level empirical-Bayes uncertainty, resample the paired historical records:
+
+$$\left(\widehat{\beta}_s,v_s\right).$$
+
+The coefficient and its sampling variance must remain paired.
+
+For each bootstrap replicate:
+
+1. Resample contiguous blocks of historical dates.
+2. Reconstruct the bootstrap sequence of paired date-level records.
+3. Recompute $$\widehat{\tau}_{\beta,t}^2$$.
+4. Recompute $$\widehat{\mu}_{\beta,t}$$.
+5. Recompute $$\widehat{\mu}_{\beta,t}^{+}$$.
+6. Recompute the uniqueness-weighted sensitivity when required.
+7. Save the resulting estimator.
+
+Do not state that the historical cross-sectional slopes are re-estimated from individual stocks unless the bootstrap actually resamples complete stock-date cross-sections.
+
+For the 63-day horizon, use a moving-block bootstrap with block length three monthly rebalance observations as the primary specification.
+
+Report block lengths two and four as sensitivities.
+
+A stationary bootstrap with expected block length three may be reported as an additional sensitivity because it randomizes block lengths and reduces fixed-boundary artifacts.
+
+For the 21-day horizon, use Newey-West uncertainty with at least one lag and report a short block-bootstrap sensitivity.
+
+Use at least 5,000 bootstrap replicates for final reported confidence intervals.
+
+NON-OVERLAPPING 63-DAY ESTIMATES
+
+Construct three staggered 63-day sequences:
+
+Sequence A: $$s_1,s_4,s_7,...$$
+
+Sequence B: $$s_2,s_5,s_8,...$$
+
+Sequence C: $$s_3,s_6,s_9,...$$
+
+Do not assume that this index construction guarantees non-overlap. Verify the actual trading-date intervals.
+
+Within a valid sequence, require:
+
+$$\mathcal{I}_{s_j}^{(63)}\cap\mathcal{I}_{s_k}^{(63)}=\varnothing\quad\text{for }j\neq k.$$
+
+For the all-date estimator and each valid non-overlapping sequence, compare:
+
+1. Estimated population mean.
+2. Estimated between-date variance.
+3. Current unrestricted forecast slope.
+4. Sign-constrained forecast slope.
+5. Variance-floor frequency.
+6. Zero-floor frequency.
+
+The non-overlapping estimates are robustness checks. They are not expected to be more precise because they use fewer dates.
+
+WHAT EACH METHOD DOES
+
+Completed-outcome filtering addresses future-label leakage.
+
+Concurrency and uniqueness quantify redundancy among completed labels.
+
+Newey-West inference estimates uncertainty in time-series summary statistics.
+
+Block bootstrap preserves short-range dependence when constructing confidence intervals.
+
+Non-overlapping sequences test whether conclusions survive after removing mechanical return-window overlap.
+
+None of these methods eliminates factor-selection bias, LLM pretraining contamination, sector exposure, or universe survivorship.
+
+============================================================
+REPLACE: DEPENDENCE AWARE SIGNAL INFERENCE
+============================================================
+
+PRIMARY SIGNAL EVIDENCE AND SEARCH-ADJUSTED INFERENCE
+
+The main paper should not display every available diagnostic for every factor as a separate result.
+
+For each of the nine frozen candidate factors and each horizon, create one consolidated table containing:
+
+1. Mean rank IC.
+2. Moving-block-bootstrap confidence interval for mean rank IC.
+3. Percentage of dates with positive rank IC.
+4. Mean Q5-minus-Q1 active-return spread.
+5. Moving-block-bootstrap confidence interval for the Q5-minus-Q1 spread.
+6. Sector-neutral Q5-minus-Q1 spread.
+7. Moving-block-bootstrap confidence interval for the sector-neutral spread.
+
+IC standard deviation, IC information ratio, Newey-West $$t$$-statistics, and complete date-level series should be retained in the saved outputs and placed in an appendix table.
+
+The main inferential emphasis should be confidence intervals and economically interpretable effect sizes rather than a large collection of closely related $$t$$-statistics.
+
+PRESPECIFIED PRIMARY STATISTIC
+
+State one primary factor-evaluation statistic before running the final inference.
+
+The recommended primary statistic is the 63-day mean rank IC because it evaluates cross-sectional ordering without depending on extreme return magnitudes.
+
+The 63-day Q5-minus-Q1 spread is the key complementary economic statistic because the existing evidence suggests that predictive separation is concentrated in the upper tail.
+
+WITHIN-DATE PERMUTATION FALSIFICATION TEST
+
+For each historical date, randomly permute the active-return vector across stocks in the exact valid cross-section.
+
+Use the same permuted return vector to evaluate all nine candidate factors at that date. This preserves cross-factor dependence under the permutation null.
+
+For factor $$j$$, define a studentized rank-IC statistic:
+
+$$T_j=\frac{\overline{\mathrm{IC}}_j}{\widehat{\operatorname{SE}}_{NW}\left(\overline{\mathrm{IC}}_j\right)}.$$
+
+For permutation replicate $$b$$, calculate:
+
+$$M^{(b)}=\max_{1\leq j\leq 9}\left|T_j^{(b)}\right|.$$
+
+The search-adjusted p-value for the selected factor is:
+
+$$p_{\mathrm{adj}}=\frac{1+\sum_{b=1}^{B}\mathbf{1}\left\{M^{(b)}\geq\left|T_{\mathrm{selected}}\right|\right\}}{B+1}.$$
+
+Use a common permutation for every candidate factor within a date.
+
+Run an analogous max-statistic test for the 63-day Q5-minus-Q1 spread if upper-tail separation materially influenced the original factor-selection decision.
+
+This test is a search-adjusted cross-sectional falsification check. It does not replace the block-bootstrap confidence intervals and does not correct for unrecorded experimentation outside the nine documented candidates.
+
+FOLD STABILITY
+
+Divide the sample into three chronological descriptive periods.
+
+For the selected factor, report by period:
+
+1. Mean rank IC.
+2. Q5-minus-Q1 spread.
+3. Sign of each effect.
+4. Number of dates.
+
+Report the median period result, the worst period, and whether the sign is consistent.
+
+These are descriptive stability checks, not sealed holdouts, because the entire historical sample influenced the research process.
+
+============================================================
+REPLACE: CALIBRATION VALIDATION
+============================================================
+
+CALIBRATION VALIDATION
+
+The empirical-Bayes estimator must be evaluated using genuine point-in-time forecasts.
+
+At each forecast date $$t$$:
+
+1. Construct $$W_h(t)$$.
+2. Estimate $$\widehat{\mu}_{\beta,t}$$ using only $$W_h(t)$$.
+3. Save the unrestricted and sign-constrained stock-level forecasts.
+4. Wait until $$e_h(t)$$ is complete.
+5. Estimate the subsequently realized direct slope $$\widehat{\beta}_t$$.
+6. Compare the previously saved forecast with the realized slope.
+
+No forecast may be reconstructed using a later version of the historical window.
+
+DATE-LEVEL FORECAST ERROR
+
+Define:
+
+$$e_t=\widehat{\beta}_t-\widehat{\mu}_{\beta,t}.$$
+
+Report:
+
+1. Mean forecast slope.
+2. Mean realized slope.
+3. Mean forecast error.
+4. Mean absolute error.
+5. Root mean squared error.
+6. RMSE relative to a zero-slope forecast.
+7. Percentage of dates for which the forecast and realized slope have the same sign.
+
+The zero-slope benchmark is essential because a sophisticated estimator should not be retained merely because it produces smoother forecasts.
+
+CALIBRATION REGRESSION
+
+Estimate:
+
+$$\widehat{\beta}_t=a+c\widehat{\mu}_{\beta,t}+u_t.$$
+
+Approximate ideal calibration corresponds to:
+
+$$a=0.$$
+
+$$c=1.$$
+
+Use moving-block-bootstrap or HAC confidence intervals for $$a$$ and $$c$$.
+
+Because the number of forecast dates is small, treat this regression as a descriptive calibration diagnostic rather than a decisive hypothesis test.
+
+Do not report correlation between forecast and realized slopes as a primary standalone statistic. With a short sample, it is unstable and is largely redundant with the calibration regression and forecast-error statistics.
+
+RETURN-SCALE VALIDATION
+
+The linear empirical-Bayes model preserves the ranking of $$z_{i,t}$$. Therefore, a stock-level decile calibration plot largely repeats the existing quantile-return analysis.
+
+Replace the ten-decile plot with a direct scale check.
+
+For each date, calculate the Q5-minus-Q1 spread implied by the linear forecast:
+
+$$\widehat{\Delta}_{t,Q5-Q1}=\widehat{\mu}_{\beta,t}\left(\overline{z}_{Q5,t}-\overline{z}_{Q1,t}\right).$$
+
+The realized spread is:
+
+$$\Delta_{t,Q5-Q1}=\overline{y}_{Q5,t}-\overline{y}_{Q1,t}.$$
+
+Compare predicted and realized spreads using:
+
+1. Mean predicted spread.
+2. Mean realized spread.
+3. Bias.
+4. MAE.
+5. RMSE.
+6. Realized-to-predicted spread ratio.
+7. A predicted-versus-realized scatterplot with a 45-degree line.
+
+This directly evaluates whether the empirical-Bayes slope assigns a plausible return magnitude to the existing signal ranking.
+
+ROLLING ESTIMATOR FIGURE
+
+Use one two-panel figure.
+
+Panel A:
+
+1. Previously saved point-in-time forecast slope $$\widehat{\mu}_{\beta,t}$$.
+2. Subsequently realized direct slope $$\widehat{\beta}_t$$.
+3. Dependence-aware confidence band for the forecast slope.
+4. Marker showing dates on which the zero floor would bind.
+
+Panel B:
+
+1. Raw completed-date count $$|W_h(t)|$$.
+2. Uniqueness-equivalent count $$N_{\mathrm{unique},t}^{(h)}$$.
+3. Marker showing dates on which the variance floor binds.
+
+Do not create separate plots for every diagnostic when the same information can be shown in these two panels.
+
+ESTIMATOR COMPARISON
+
+Compare the following slope forecasts:
+
+1. Zero-slope forecast.
+2. Simple expanding-window unweighted mean.
+3. Fixed-effect inverse-sampling-variance mean.
+4. Random-effects empirical-Bayes population mean.
+5. Q5-premium empirical-Bayes forecast.
+
+The fixed-effect benchmark is:
+
+$$\widehat{\mu}_{\beta,t}^{FE}=\frac{\sum_{s\in W_h(t)}v_s^{-1}\widehat{\beta}_s}{\sum_{s\in W_h(t)}v_s^{-1}}.$$
+
+The random-effects empirical-Bayes estimator is:
+
+$$\widehat{\mu}_{\beta,t}=\frac{\sum_{s\in W_h(t)}\left(\widehat{\tau}_{\beta,t}^2+v_s\right)^{-1}\widehat{\beta}_s}{\sum_{s\in W_h(t)}\left(\widehat{\tau}_{\beta,t}^2+v_s\right)^{-1}}.$$
+
+The raw standardized signal should not be included in the slope-calibration comparison because it is unitless and is not a slope estimate. It remains an important portfolio benchmark.
+
+Retain empirical Bayes only if it improves forecast error, stability, or portfolio behavior relative to the simpler zero, unweighted-mean, and fixed-effect benchmarks.
+
+============================================================
+REPLACE: CURRENT Q5 FORECAST
+============================================================
+
+CURRENT Q5 FORECAST
+
+Let $$\widehat{\mu}_{\delta,t}$$ denote the empirical-Bayes estimate of the population mean Q5-versus-non-Q5 premium using only completed historical dates.
+
+The optional nonnegative premium is:
+
+$$\widehat{\mu}_{\delta,t}^{+}=\max\left\{0,\widehat{\mu}_{\delta,t}\right\}.$$
+
+Let:
+
+$$I_{i,t}=\mathbf{1}\left\{i\in Q5_t\right\}.$$
+
+Let:
+
+$$p_t=\frac{1}{N_t}\sum_i I_{i,t}.$$
+
+The centered Q5 stock-level forecast is:
+
+$$\widehat{\mu}_{i,t,Q5}=\widehat{\mu}_{\delta,t}^{+}\left(I_{i,t}-p_t\right).$$
+
+This guarantees:
+
+$$\sum_i\widehat{\mu}_{i,t,Q5}=0.$$
+
+The Q5 estimator is not another scaling of the continuous signal. It creates a two-level forecast structure and should be treated as a distinct nonlinear estimator.
+
+Do not introduce an additional symbol such as $$\widehat{d}_t$$ for $$\widehat{\mu}_{\delta,t}$$. Use the population-mean notation directly.
+
+============================================================
+ADD: PAPER-FACING FIGURE AND TABLE PLAN
+============================================================
+
+PAPER-FACING FIGURE AND TABLE PLAN
+
+The main paper should contain enough diagnostics to establish measurement validity, predictive evidence, overlap awareness, calibration, and economic use. It should not reproduce every implementation diagnostic as a separate plot.
+
+MAIN-TEXT FIGURES
+
+FIGURE 1: POINT-IN-TIME MEASUREMENT PIPELINE
+
+Show:
+
+SEC filing acceptance and availability → selected filing → structured summary and evidence → semantic similarity and exposure materiality → standardized interaction signal → completed historical returns → empirical-Bayes calibration → expected active returns → optimizer.
+
+Include the three distinct timestamps:
+
+1. Fiscal period end.
+2. SEC acceptance or public-knowledge time.
+3. Strategy availability or ingestion time.
+
+FIGURE 2: PRIMARY SIGNAL EVIDENCE
+
+Panel A: Mean rank IC for all nine factors at 21 and 63 days with block-bootstrap confidence intervals.
+
+Panel B: Mean active return by signal quintile for the selected factor at 21 and 63 days.
+
+Panel C: Date-level 63-day Q5-minus-Q1 spread for the selected factor with a block-bootstrap mean and confidence interval.
+
+This figure establishes:
+
+1. Where the selected factor ranks among documented alternatives.
+2. Whether the relationship is stronger at 63 days.
+3. Whether the effect is concentrated in Q5 rather than smoothly linear.
+
+FIGURE 3: OVERLAP AND INFORMATION CONTENT
+
+Panel A: Number of completed dates and uniqueness-equivalent count through time.
+
+Panel B: Distribution of average label uniqueness for the 21-day and 63-day horizons.
+
+Panel C: Autocorrelation of the date-level slope or rank-IC series.
+
+This replaces a generic statement that the 63-day labels overlap with a direct measurement of how much redundancy is present.
+
+FIGURE 4: POINT-IN-TIME EMPIRICAL-BAYES CALIBRATION
+
+Panel A: Point-in-time forecast slope $$\widehat{\mu}_{\beta,t}$$, subsequently realized direct slopes $$\widehat{\beta}_t$$, and dependence-aware forecast intervals.
+
+Panel B: Predicted versus realized date-level slopes with a 45-degree reference line.
+
+Optional appendix panel: direct historical slopes and retrospective shrunk slopes at the final estimation date.
+
+FIGURE 5: RETURN-SCALE VALIDATION
+
+Panel A: Predicted versus realized Q5-minus-Q1 spread for the linear empirical-Bayes estimator.
+
+Panel B: Predicted versus realized Q5 premium for the Q5 empirical-Bayes estimator.
+
+This replaces the stock-level ten-decile calibration plot.
+
+FIGURE 6: PORTFOLIO DEMONSTRATION
+
+Panel A: Cumulative net active return for the principal portfolio benchmarks.
+
+Panel B: Turnover and estimated transaction costs.
+
+Do not place every exposure and concentration series in the same figure. Report those in a portfolio summary table.
+
+MAIN-TEXT TABLES
+
+TABLE 1: SAMPLE AND MEASUREMENT AUDIT
+
+Include:
+
+1. Number of firms and rebalance dates.
+2. Number of 10-K and 10-Q observations.
+3. Filing-age summary.
+4. Materiality-category distribution.
+5. Interaction-versus-component correlations.
+6. Universe construction.
+7. OpenAI model and execution dates.
+8. Prompt, schema, and theme versions.
+
+TABLE 2: COMPLETE FROZEN FACTOR COMPARISON
+
+For all nine factors and both horizons, report:
+
+1. Mean rank IC.
+2. Block-bootstrap confidence interval.
+3. Positive-date share.
+4. Q5-minus-Q1 spread and confidence interval.
+5. Sector-neutral spread and confidence interval.
+6. Search-adjusted max-statistic result for the prespecified primary statistic.
+
+TABLE 3: EMPIRICAL-BAYES AND CALIBRATION RESULTS
+
+Report:
+
+1. Number of point-in-time forecast dates.
+2. Raw completed-date count.
+3. Uniqueness-equivalent count.
+4. Mean estimated between-date variance.
+5. Variance-floor frequency.
+6. Mean forecast slope.
+7. Mean realized slope.
+8. Bias, MAE, and RMSE.
+9. RMSE relative to zero.
+10. Calibration intercept and slope with dependence-aware intervals.
+11. Zero-floor frequency.
+12. Ordinary versus uniqueness-weighted sensitivity.
+13. All-date versus non-overlapping 63-day sensitivity.
+
+TABLE 4: PORTFOLIO COMPARISON
+
+Compare:
+
+1. Simple Q5-minus-Q1.
+2. Raw standardized signal through the optimizer.
+3. Simple expanding-mean calibration.
+4. Empirical-Bayes calibration.
+5. Q5-premium empirical Bayes.
+
+Report:
+
+1. Gross and net active return.
+2. Annualized volatility.
+3. Maximum drawdown.
+4. Turnover.
+5. Estimated transaction costs.
+6. Gross and net exposure.
+7. Maximum sector deviation.
+8. Weight concentration.
+
+APPENDIX MATERIAL
+
+Move the following to the appendix unless a material problem is found:
+
+1. Full 10-K and 10-Q distribution plots.
+2. Detailed filing-age histograms.
+3. All individual factor time-series plots.
+4. IC standard deviations and IC information ratios.
+5. Newey-West $$t$$-statistics when block-bootstrap intervals are already in the main table.
+6. Baseline versus winsorized historical slopes.
+7. Huber results, if implemented.
+8. Stationary-bootstrap sensitivity.
+9. Block-length sensitivities.
+10. Three individual non-overlapping 63-day sequences.
+11. Retrospective shrunk historical slopes.
+12. Full optimizer exposure and weight-correlation diagnostics.
+
+============================================================
+REPLACE RELEVANT PARTS OF IMPLEMENTATION ORDER
+============================================================
+
+REVISED IMPLEMENTATION ORDER
+
+PHASE 1: SIGNAL CONTRACT AND FOCUSED MEASUREMENT AUDITS
+
+1. Create immutable analysis manifest.
+2. Record filing accession, period end, acceptance time, availability time, and ingestion time.
+3. Record model, prompt, schema, theme, embedding, and output hashes.
+4. Verify universe construction.
+5. Complete interaction-versus-components ablation.
+6. Complete concise 10-K-versus-10-Q table and 10-K-only robustness.
+7. Complete filing-age summary and 180-day exclusion.
+8. Freeze the exact nine-factor candidate table.
+
+PHASE 2: PRIMARY SIGNAL INFERENCE AND SEARCH CONTROL
+
+1. Build date-level rank IC and Q5-minus-Q1 series.
+2. Calculate Newey-West summaries.
+3. Calculate moving-block-bootstrap confidence intervals.
+4. Produce the consolidated nine-factor table.
+5. Run the common-permutation max-statistic test.
+6. Produce three-period descriptive stability results.
+7. Calculate sector-neutral spreads and intervals.
+
+PHASE 3: EMPIRICAL-BAYES CORE
+
+1. Enforce the completed-outcome rule.
+2. Estimate direct historical cross-sectional slopes.
+3. Estimate HC1 sampling variances.
+4. Estimate baseline and winsorized slopes.
+5. Estimate between-date variance.
+6. Estimate the population mean.
+7. Generate retrospective shrunk historical slopes.
+8. Generate unrestricted point-in-time expected-return panels.
+9. Generate sign-constrained sensitivity panels.
+10. Run prefix-invariance and future-mutation tests.
+
+PHASE 4: OVERLAP AND UNIQUENESS
+
+1. Construct exact return-label intervals.
+2. Calculate concurrency.
+3. Calculate average uniqueness.
+4. Calculate the uniqueness-equivalent count.
+5. Implement uniqueness-weighted mean sensitivity.
+6. Implement moving-block bootstrap of paired date-level records.
+7. Run block-length sensitivities.
+8. Construct and verify non-overlapping 63-day sequences.
+9. Compare all-date, uniqueness-weighted, and non-overlapping estimates.
+
+PHASE 5: POINT-IN-TIME CALIBRATION
+
+1. Build the forecast-versus-realized slope table.
+2. Calculate bias, MAE, RMSE, and improvement over zero.
+3. Estimate the descriptive calibration regression.
+4. Construct predicted-versus-realized slope plot.
+5. Construct predicted-versus-realized Q5-minus-Q1 scale plot.
+6. Construct the two-panel rolling estimator and uniqueness figure.
+7. Compare zero, unweighted mean, fixed-effect, random-effects EB, and Q5 EB.
+
+PHASE 6: OPTIMIZER AND PAPER EXHIBITS
+
+1. Compare the simple Q5-minus-Q1 portfolio.
+2. Compare the raw-signal optimizer.
+3. Compare simple-mean calibration.
+4. Compare empirical-Bayes calibration.
+5. Compare Q5-premium empirical Bayes.
+6. Apply the actual risk, turnover, gross, sector, and position constraints.
+7. Calculate gross and net results.
+8. Produce the six main figures and four main tables.
+9. Move secondary diagnostics into the appendix.
+
+============================================================
+REFERENCE NOTE FOR THE METHODOLOGY SECTION
+============================================================
+
+Use López de Prado, Advances in Financial Machine Learning, Chapter 4, pages 59–67, for overlapping labels, concurrency, average uniqueness, and sequential-bootstrap motivation.
+
+Use López de Prado, Chapter 7, pages 103–109, for purging and embargo.
+
+Use Jansen, Machine Learning for Trading, Third Edition, pages 137–141 and 150–160, for point-in-time label completion, overlap-aware evaluation, effective sample information, HAC inference, block-bootstrap intervals, and fold stability.
+
+Use Jansen, pages 240–249, for the text-to-signal and structured-extraction contract.
+
+Use Jansen, pages 195–199, for interaction diagnostics.
+
+Use Efron and Hastie, Computer Age Statistical Inference, page 168, for the moving-block bootstrap.
+
+The main methodological distinction should remain:
+
+Purging prevents unfinished future outcomes from entering estimation.
+
+Uniqueness measures redundancy among completed overlapping outcomes.
+
+Empirical Bayes separates date-specific slope noise from the estimated population distribution.
+
+Block-bootstrap inference evaluates uncertainty under temporal dependence.
+
+The optimizer demonstrates the economic use of the expected-return estimates but is not the primary scientific contribution.
+```
